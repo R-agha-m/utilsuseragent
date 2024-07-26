@@ -138,7 +138,7 @@ wheels/
 docs/
 configs/
 test/
-requirements_for_test.txt
+requirements_test.txt
 docker-compose-with-build.yml
 docker-compose.yaml
 doc
