@@ -3,25 +3,10 @@ from sqlite3 import (
     OperationalError,
 )
 
+from aiosqlite import connect as async_connect
 from ua_parser import user_agent_parser
 
-TABLE_CREATION_QUERY = '''
-                        CREATE TABLE user_agent (
-                            user_agent TEXT PRIMARY KEY NOT NULL UNIQUE,
-                            browser_family TEXT,
-                            browser_major INTEGER,
-                            browser_minor INTEGER,
-                            browser_patch INTEGER,
-                            os_family TEXT,
-                            os_major INTEGER,
-                            os_minor INTEGER,
-                            os_patch INTEGER,
-                            os_patch_minor INTEGER,
-                            device_family TEXT,
-                            device_brand TEXT,
-                            device_model TEXT
-                        )
-                    '''
+from .table_creation_query import TABLE_CREATION_QUERY
 
 
 class CreateUserAgent:
@@ -32,13 +17,22 @@ class CreateUserAgent:
     ) -> None:
         self.database_connection_string = database_connection_string
 
-    def __call__(
+    def perform(
             self,
             user_agent_string: str,
-    ) -> dict[str, str | None]:
+    ):
         parsed = self._parse(user_agent_string=user_agent_string)
         details = self._extract_details(parsed=parsed)
         self._insert_into_db(details=details)
+        return details
+
+    async def async_perform(
+            self,
+            user_agent_string: str,
+    ):
+        parsed = self._parse(user_agent_string=user_agent_string)
+        details = self._extract_details(parsed=parsed)
+        await self._async_insert_into_db(details=details)
         return details
 
     @staticmethod
@@ -66,6 +60,36 @@ class CreateUserAgent:
             'device_model': parsed['device']['model'],
         }
 
+    async def _async_insert_into_db(
+            self,
+            details: dict[str, str | None]
+    ) -> None:
+        async with async_connect(self.database_connection_string) as connection:
+            async with connection.cursor() as cursor:
+                await self._async_create_table(cursor=cursor)
+                await self._async_create_row(
+                    cursor=cursor,
+                    connection=connection,
+                    details=details,
+                )
+
+    @staticmethod
+    async def _async_create_table(cursor):
+        try:
+            await cursor.execute(TABLE_CREATION_QUERY)
+        except OperationalError:
+            pass
+
+    async def _async_create_row(
+            self,
+            cursor,
+            connection,
+            details: dict[str, str | None]
+    ):
+        query = self.create_insertion_query(details=details)
+        await cursor.execute(query)
+        await connection.commit()
+
     def _insert_into_db(
             self,
             details: dict[str, str | None]
@@ -74,7 +98,7 @@ class CreateUserAgent:
             cursor = connection.cursor()
 
             self._create_table(cursor=cursor)
-            self._insert_into_db_core(
+            self._create_row(
                 cursor=cursor,
                 connection=connection,
                 details=details,
@@ -87,44 +111,23 @@ class CreateUserAgent:
         except OperationalError:
             pass
 
-    @staticmethod
-    def _insert_into_db_core(
+    def _create_row(
+            self,
             cursor,
             connection,
             details: dict[str, str | None]
     ):
+        query = self.create_insertion_query(details=details)
+        cursor.execute(query)
+        connection.commit()
+
+    @staticmethod
+    def create_insertion_query(details: dict[str, str | None]) -> str:
         columns_names = '"' + '", "'.join(details.keys()) + '"'
         columns_values = '"' + '", "'.join([i or "null" for i in details.values()]) + '"'
 
-        query = f"""
+        return f"""
         INSERT INTO user_agent 
         ({columns_names}) 
         VALUES ({columns_values})
         """
-
-        cursor.execute(query)
-        connection.commit()
-
-
-def create_user_agent(
-        user_agent_string: str,
-        database_connection_string: str = 'user_agent.sqlite',
-):
-    create_user_agent_instance = CreateUserAgent(database_connection_string=database_connection_string)
-    return create_user_agent_instance(
-        user_agent_string=user_agent_string,
-    )
-
-
-if __name__ == "__main__":
-    import pprint
-
-    pp = pprint.PrettyPrinter(indent=4)
-
-    create_user_agent_instance_2 = CreateUserAgent()
-    result = create_user_agent_instance_2(
-        user_agent_string="Mozilla/5.0 (Linux; Android 14; SM-S911B Build/UP1A.231005.007; wv) AppleWebKit/537.36 "
-                          "(KHTML, like Gecko) Version/4.0 Chrome/121.0.6167.164 Mobile Safari/537.3",
-    )
-
-    pp.pprint(result)
