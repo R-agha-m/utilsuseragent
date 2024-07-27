@@ -1,6 +1,6 @@
 from typing import Any
 from collections.abc import Sequence
-from sqlite3 import connect
+from sqlite3 import connect, Row
 
 from aiosqlite import connect as async_connect
 
@@ -47,29 +47,40 @@ class FetchUserAgent:
 
     @staticmethod
     def _create_query(filter_: str) -> str:
-        return f"""
-        SELECT * 
-        FROM user_agent 
-        WHERE {filter_}
-        ORDER BY RANDOM() LIMIT 1;
-        """
+        if filter_:
+            return f"""
+            SELECT * 
+            FROM user_agent 
+            WHERE {filter_}
+            ORDER BY RANDOM() LIMIT 1;
+            """
+        else:
+            return f"""
+            SELECT * 
+            FROM user_agent 
+            ORDER BY RANDOM() LIMIT 1;
+            """
 
     def _fetch(
             self,
             query: str,
     ) -> tuple[str]:
         with connect(self.database_connection_string) as connection:
+            connection.row_factory = Row
             cursor = connection.cursor()
             cursor.execute(query)
 
-            return cursor.fetchone()
+            row = cursor.fetchone()
+            return dict(row)
 
     async def _async_fetch(
             self,
             query: str,
     ) -> tuple[str]:
         async with async_connect(self.database_connection_string) as connection:
+            connection.row_factory = Row
             cursor = await connection.cursor()
             await cursor.execute(query)
 
-            return await cursor.fetchone()
+            row = await cursor.fetchone()
+            return dict(row)

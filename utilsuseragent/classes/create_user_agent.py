@@ -1,6 +1,7 @@
 from sqlite3 import (
     connect,
     OperationalError,
+    IntegrityError,
 )
 
 from aiosqlite import connect as async_connect
@@ -87,8 +88,11 @@ class CreateUserAgent:
             details: dict[str, str | None]
     ):
         query = self.create_insertion_query(details=details)
-        await cursor.execute(query)
-        await connection.commit()
+        try:
+            await cursor.execute(query)
+            await connection.commit()
+        except IntegrityError:
+            pass
 
     def _insert_into_db(
             self,
@@ -118,8 +122,11 @@ class CreateUserAgent:
             details: dict[str, str | None]
     ):
         query = self.create_insertion_query(details=details)
-        cursor.execute(query)
-        connection.commit()
+        try:
+            cursor.execute(query)
+            connection.commit()
+        except IntegrityError:
+            pass
 
     @staticmethod
     def create_insertion_query(details: dict[str, str | None]) -> str:
