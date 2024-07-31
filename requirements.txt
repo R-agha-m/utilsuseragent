@@ -1,2 +1,2 @@
-ua-parser==0.18.*
-aiosqlite==0.20.*
+ua-parser>=0.18
+aiosqlite>=0.20

@@ -7,6 +7,11 @@ with open("README.md", "r", encoding="utf-8") as handler:
     LONG_DESCRIPTION = handler.read()
 
 
+# ================================================================================================= VERSION
+with open("VERSION", "r", encoding="utf-8") as handler:
+    VERSION = handler.read().lstrip('v')
+
+
 # ================================================================================================= install_requires
 def parse_requirements(filename):
     with open(filename) as f:
@@ -27,7 +32,7 @@ else:
 # ==============================================================================
 setup(
     name="utilsuseragent",
-    version="0.0.2",
+    version=VERSION,
     packages=find_packages(),
     package_data={
         'utilsuseragent': ['user_agent.sqlite'],
