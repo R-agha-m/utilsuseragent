@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as handler:
 setup(
     name="utilsuseragent",
     version="0.0.1.20240731",
-    packages=["utilsuseragent"],
+    packages=find_packages(),
     install_requires=[
         # List your project's dependencies here.
         # Example: 'requests>=2.20.0',
