@@ -1,11 +1,30 @@
 from setuptools import setup, find_packages
+from sys import platform
+from os.path import exists
 
-# ============================================================================== LONG_DESCRIPTION
+# ================================================================================================= LONG_DESCRIPTION
 with open("README.md", "r", encoding="utf-8") as handler:
     LONG_DESCRIPTION = handler.read()
 
-# TODO: read from requirements.txt for multiple os for install_requires
 
+# ================================================================================================= install_requires
+def parse_requirements(filename):
+    with open(filename) as f:
+        return f.read().splitlines()
+
+
+if exists('requirements.txt'):
+    install_requires = parse_requirements('requirements.txt')
+
+else:
+    if platform.startswith('win'):
+        install_requires = parse_requirements('requirements-windows.txt')
+    elif platform == 'darwin':
+        install_requires = parse_requirements('requirements-macos.txt')
+    elif platform.startswith('linux'):
+        install_requires = parse_requirements('requirements-linux.txt')
+
+# ==============================================================================
 setup(
     name="utilsuseragent",
     version="0.0.2",
@@ -14,8 +33,7 @@ setup(
         'utilsuseragent': ['user_agent.sqlite'],
     },
     include_package_data=True,
-    install_requires=[
-    ],
+    install_requires=install_requires,
     author="Reza 'Sam' Aghamohammadi (Hacknitive)",
     author_email="hacknitive@gmail.com",
     description="Create and get real useragent strings",
