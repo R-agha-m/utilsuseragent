@@ -7,6 +7,7 @@ from sqlite3 import (
 from aiosqlite import connect as async_connect
 from ua_parser import user_agent_parser
 
+from .default_connection_string import DEFAULT_DATABASE_CONNECTION_STRING
 from .table_creation_query import TABLE_CREATION_QUERY
 
 
@@ -14,9 +15,9 @@ class CreateUserAgent:
 
     def __init__(
             self,
-            database_connection_string: str = 'user_agent.sqlite',
+            database_connection_string: str | None = DEFAULT_DATABASE_CONNECTION_STRING,
     ) -> None:
-        self.database_connection_string = database_connection_string
+        self.database_connection_string = database_connection_string or DEFAULT_DATABASE_CONNECTION_STRING
 
     def perform(
             self,
