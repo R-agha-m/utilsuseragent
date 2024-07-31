@@ -1,1 +1,0 @@
-from utilsuseragent.utilsuseragent import *

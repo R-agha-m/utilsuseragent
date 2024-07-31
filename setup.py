@@ -1,13 +1,26 @@
 from setuptools import setup, find_packages
 
+# ============================================================================== LONG_DESCRIPTION
 with open("README.md", "r", encoding="utf-8") as handler:
-    long_description = handler.read()
+    LONG_DESCRIPTION = handler.read()
+
+# ============================================================================== version
+VERSION_MAJOR_MINOR = "0.0"
+
+with open("build_version", "r+", encoding="utf-8") as handler:
+    old_build_version = handler.read()
+    new_build_version = int(old_build_version) + 1
+    handler.seek(0)
+    handler.write(str(new_build_version))
+    handler.truncate()
+
+VERSION = f"{VERSION_MAJOR_MINOR}.{new_build_version}"
 
 # TODO: read from requirements.txt for multiple os for install_requires
 
 setup(
     name="utilsuseragent",
-    version="0.0.1.20240731",
+    version=VERSION,
     packages=find_packages(),
     package_data={
         'utilsuseragent': ['user_agent.sqlite'],
@@ -23,7 +36,7 @@ setup(
     author="Reza 'Sam' Aghamohammadi (Hacknitive)",
     author_email="hacknitive@gmail.com",
     description="Create and get real useragent strings",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url="https://github.com/hacknitive/utilsuseragent",
     license="MIT",
