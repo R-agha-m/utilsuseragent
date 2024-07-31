@@ -9,9 +9,11 @@ setup(
     name="utilsuseragent",
     version="0.0.1.20240731",
     packages=find_packages(),
+    # package_data={
+    #     'utilsuseragent': ['user_agent.sqlite'],
+    # },
+    include_package_data=True,
     install_requires=[
-        # List your project's dependencies here.
-        # Example: 'requests>=2.20.0',
     ],
     # entry_points={
     #     'console_scripts': [
