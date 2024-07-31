@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as handler:
 
 setup(
     name="utilsuseragent",
-    version="0.0.1",
+    version="0.0.2",
     packages=find_packages(),
     package_data={
         'utilsuseragent': ['user_agent.sqlite'],
