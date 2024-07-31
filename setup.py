@@ -8,8 +8,7 @@ with open("README.md", "r", encoding="utf-8") as handler:
 
 setup(
     name="utilsuseragent",
-    use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    version="0.0.1",
     packages=find_packages(),
     package_data={
         'utilsuseragent': ['user_agent.sqlite'],
