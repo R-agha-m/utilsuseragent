@@ -123,11 +123,11 @@ class CreateUserAgent:
             details: dict[str, str | None]
     ):
         query = self.create_insertion_query(details=details)
-        try:
-            cursor.execute(query)
-            connection.commit()
-        except IntegrityError:
-            pass
+        # try:
+        cursor.execute(query)
+        connection.commit()
+        # except IntegrityError:
+        #     pass
 
     @staticmethod
     def create_insertion_query(details: dict[str, str | None]) -> str:

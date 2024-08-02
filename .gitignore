@@ -120,3 +120,4 @@ ssh/
 sam_*.py
 sam_*/
 **/user_agent_test.sqlite
+utilsuseragent.egg-info

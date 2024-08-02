@@ -2,6 +2,7 @@ from . import logo
 
 from .classes.create_user_agent import CreateUserAgent
 from .classes.fetch_user_agent import FetchUserAgent
+from .classes.default_connection_string import DEFAULT_DATABASE_CONNECTION_STRING
 
 from .function.create_user_agent_async_func import create_user_agent_async_func
 from .function.create_user_agent_func import create_user_agent_func
